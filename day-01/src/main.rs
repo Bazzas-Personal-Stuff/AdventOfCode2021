@@ -1,40 +1,30 @@
 use std::io;
-use std::io::prelude::*;
 
+// This is a rewrite after discussing performance optimisations with others.
+// My original solution can still be found in main_old.rs
 fn main(){
+    let mut buf = String::new();
     let stdin = io::stdin();
-    let mut array: [i32; 3] = [0; 3];
-
-    for i in 0..3 {
-        let mut buf = String::new();
-        stdin.read_line(&mut buf).expect("first line read error");
-        array[i] = buf.trim().parse::<i32>().expect("first line parse error");
-    }
-
-    let mut prev_sum = 0;
-    for num in &array {
-        prev_sum += num;
-    }
-
+    let mut arr: [i32; 3] = [0; 3];
     let mut count = 0;
+    let mut oldest = 0;
 
-    for line in stdin.lock().lines() {
-        for i in 1..3 {
-            array[i-1] = array[i];
-        }
-        let this_int = line.unwrap().parse::<i32>().expect("bad line");
-        array[2] = this_int;
+    for i in 0..3{
+        stdin.read_line(&mut buf).expect("Read error");
+        arr[i] = buf.trim().parse::<i32>().unwrap();
+        buf.clear();
+    }
 
-        let mut this_sum = 0;
-        for num in &array{
-            this_sum += num;
-        }
+    while stdin.read_line(&mut buf).unwrap() != 0 {
+        let new_num = buf.trim().parse::<i32>().unwrap();
+        buf.clear();
 
-        if this_sum > prev_sum {
+        if new_num > arr[oldest] {
             count += 1;
         }
 
-        prev_sum = this_sum;
+        arr[oldest] = new_num;
+        oldest = (oldest + 1) % 3;
     }
 
     println!("There are {} measurements larger than the previous", count);
