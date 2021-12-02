@@ -2,9 +2,15 @@ use std::env;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 
+struct Transform {
+    x: i64,
+    y: i64,
+    aim: i64
+}
 
 fn main() {
-    let mut pos: [i64; 2] = [0; 2];
+
+    let mut transform = Transform { x: 0, y: 0, aim: 0 };
 
     let reader = BufReader::new(
         File::open("input.txt")
@@ -15,12 +21,12 @@ fn main() {
         let split: Vec<&str> = line_str.split_whitespace().collect();
         let dist = split[1].parse::<i64>().unwrap();
         match split[0] {
-            "forward" => pos[0] += dist,
-            "backward" => pos[0] -= dist,
-            "up" => pos[1] -= dist,
-            "down" => pos[1] += dist,
+            "forward" =>  transform.x += dist,
+            "backward" => transform.x -= dist,
+            "up" => transform.y -= dist,
+            "down" => transform.y += dist,
             _ => println!("Unexpected instruction")
         }
     }
-    println!("Multiplication result: {}", pos[0] * pos[1]);
+    println!("Multiplication result: {}", transform.x * transform.y);
 }
