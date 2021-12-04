@@ -9,25 +9,25 @@ struct Board {
     // Col_idx = idx % 5
 
     // map value -> board idx
+    solved: bool,
     positions: HashMap<i32, i32>,
     sum: i32,
     marked: i32,
     row_count: [i32; 5],
     col_count: [i32; 5],
-    // diag_count: [i32; 2],
-    completed: bool
-}
-
-fn solve_board(board: &Board, last_ball: &i32) -> i32 {
-    println!("Sum of unmarked numbers: {}\t\tLast ball: {}", board.sum, last_ball);
-    println!("Winning board: {:#?}", board.positions);
-    return board.sum * last_ball;
 }
 
 
-fn play_game(call_order: &Vec<i32>, mut boards: &mut Vec<Board>) -> Option<i32> {
+fn play_game(call_order: &Vec<i32>, boards: &mut Vec<Board>) -> (Option<i32>, Option<i32>) {
+    let mut first_score: Option<i32> = None;
+    let mut last_score: Option<i32> = None;
+
     for ball in call_order{
         for mut board in boards.iter_mut(){
+            if board.solved {
+                continue
+            };
+
             let idx = match board.positions.get(ball) {
                 None => continue,
                 Some(val) => *val as usize,
@@ -42,35 +42,33 @@ fn play_game(call_order: &Vec<i32>, mut boards: &mut Vec<Board>) -> Option<i32> 
             let col_idx = idx % 5;
             board.row_count[row_idx] += 1;
             board.col_count[col_idx] += 1;
-            // if row_idx == col_idx {
-            //     board.diag_count[0] += 1;
-            // }
-            // if row_idx == 4 - col_idx {
-            //     board.diag_count[1] += 1;
-            // }
 
             // check win conditions
             for row_markers in board.row_count.iter(){
                 if row_markers == &5{
-                    return Some(solve_board(&board, ball));
+                    board.solved = true;
+                    let score = board.sum * ball;
+                    if first_score.is_none(){
+                        first_score = Some(score);
+                    }
+                    last_score = Some(score);
                 }
             }
             for col_markers in board.col_count.iter(){
                 if col_markers == &5 {
-                    return Some(solve_board(&board, ball));
+                    board.solved = true;
+                    let score = board.sum * ball;
+                    if first_score.is_none(){
+                        first_score = Some(score);
+                    }
+                    last_score = Some(score);
                 }
             }
-            // for diag_markers in board.diag_count.iter(){
-            //     if diag_markers == &5 {
-            //         return Some(solve_board(&board, ball));
-            //     }
-            // }
-
         }
     }
 
 
-    return None;
+    return (first_score, last_score);
 }
 
 
@@ -82,13 +80,10 @@ fn main() {
             .expect("Error reading file"));
 
     let mut buf = String::new();
-    reader.read_line(&mut buf);
+    reader.read_line(&mut buf).expect("Error reading call order");
 
     let call_order: Vec<i32> = buf.trim().split(",").map(|el| i32::from_str(el).unwrap()).collect();
     buf.clear();
-
-    println!("{:?}", call_order);
-
 
     let mut boards: Vec<Board> = Vec::new();
 
@@ -97,7 +92,7 @@ fn main() {
         buf.clear();
 
         for _ in 0..5{
-            reader.read_line(&mut buf);
+            reader.read_line(&mut buf).expect("Error reading bingo card");
         }
         let board_iter = buf.trim().split_whitespace().map(|el| i32::from_str(el).unwrap());
 
@@ -110,18 +105,18 @@ fn main() {
             idx += 1;
         }
 
-        let mut this_board = Board {
+        let this_board = Board {
+            solved: false,
             positions: pos_map,
             sum,
             marked: 0,
             row_count: [0; 5],
             col_count: [0; 5],
-            // diag_count: [0; 2],
-            completed: false
         };
         boards.push(this_board);
         buf.clear();
     }
 
-    println!("Stage 1: {}", play_game(&call_order, &mut boards).unwrap_or(-1))
+    let scores = play_game(&call_order, &mut boards);
+    println!("Stage 1: {}\nStage 2: {}", scores.0.unwrap(), scores.1.unwrap())
 }
