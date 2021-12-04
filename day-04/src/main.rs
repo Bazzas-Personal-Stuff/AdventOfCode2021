@@ -44,29 +44,18 @@ fn play_game(call_order: &Vec<i32>, boards: &mut Vec<Board>) -> (Option<i32>, Op
             board.col_count[col_idx] += 1;
 
             // check win conditions
-            for row_markers in board.row_count.iter(){
-                if row_markers == &5{
-                    board.solved = true;
-                    let score = board.sum * ball;
-                    if first_score.is_none(){
-                        first_score = Some(score);
-                    }
-                    last_score = Some(score);
+            if board.row_count[row_idx] == 5 ||
+                board.col_count[col_idx] == 5 {
+
+                board.solved = true;
+                let score = board.sum * ball;
+                if first_score.is_none(){
+                    first_score = Some(score);
                 }
-            }
-            for col_markers in board.col_count.iter(){
-                if col_markers == &5 {
-                    board.solved = true;
-                    let score = board.sum * ball;
-                    if first_score.is_none(){
-                        first_score = Some(score);
-                    }
-                    last_score = Some(score);
-                }
+                last_score = Some(score);
             }
         }
     }
-
 
     return (first_score, last_score);
 }
