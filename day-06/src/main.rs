@@ -21,17 +21,17 @@ fn main() {
 
     let mut buf = String::new();
     reader.read_line(&mut buf).expect("Error reading line");
-    for num in buf.trim().split(",").map(|el| el.parse::<i32>().unwrap() as usize) {
+    for num in buf.trim().split(",").map(|el| el.parse::<usize>().unwrap()) {
         fish[num] += 1;
     }
 
 
-    for _iter in 0..80 {
+    for _i in 0..80 {
         simulate(&mut fish);
     }
     println!("Fish count after 80 days (Stage 1): {}", fish.iter().fold(0, |a, b| a + b));
 
-    for _iter in 80..256{
+    for _i in 80..256{
         simulate(&mut fish);
     }
 
