@@ -34,20 +34,23 @@ fn main() {
         fuel_median += (median - crab).abs();
     }
 
-    //stage 2
+    // stage 2
     let mut best_fuel = i64::max_value();
     let mut best_point = 0;
-    for i in inputs[0]..inputs[inputs.len()-1]{
+    for i in inputs[0]..inputs[inputs.len()-1] {
         let mut cur_fuel = 0;
 
         for crab in inputs.iter() {
             let n = (crab - i).abs();
-            cur_fuel += (n * (n+1)) / 2;
+            cur_fuel += (n * (n + 1)) / 2;
         }
 
         if cur_fuel < best_fuel {
             best_fuel = cur_fuel;
             best_point = i;
+        }
+        else {
+            break;
         }
     }
 
