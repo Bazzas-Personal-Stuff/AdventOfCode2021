@@ -18,10 +18,6 @@ fn main() {
         let mut split = line_str.split("-");
         let node_a = split.next().unwrap().to_string();
         let node_b = split.next().unwrap().to_string();
-        // node_vec.push(node_a);
-        // let a_ref= node_vec.last().unwrap();
-        // node_vec.push(node_b);
-        // let b_ref = node_vec.last().unwrap();
 
         if !nodes.contains_key(&node_a) {
             nodes.insert(node_a.clone(), Vec::new());
